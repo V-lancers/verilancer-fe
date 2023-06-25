@@ -17,9 +17,9 @@ import { sismo } from '../config';
 import { contractAddress, abi } from '../constants/smartcontractinfo';
 import { useSigner } from 'wagmi';
 import { ethers } from 'ethers';
-import UserOAuth from './UserOAuth';
 import client from '../api/apollo';
 import { ApolloQueryResult, gql } from '@apollo/client';
+import workXP from '../assets/workXP.png';
 
 function UserDetail({ user }: { user: IUser }) {
   const { user: currentUser } = useContext(TalentLayerContext);
@@ -82,7 +82,6 @@ function UserDetail({ user }: { user: IUser }) {
 
   return (
     <div>
-      <UserOAuth />
       <br></br>
       <div className='flex flex-col rounded-xl p-4 border border-gray-200'>
         <div className='flex items-top justify-between w-full'>
@@ -112,6 +111,17 @@ function UserDetail({ user }: { user: IUser }) {
               <strong>Name:</strong> {userDescription?.name}
             </p>
           )}
+
+          <p className='text-sm text-gray-500 mt-4'>
+            <strong>Skills:</strong> {userDescription?.skills_raw}
+          </p>
+          <p className='text-sm text-gray-500 mt-4'>
+            <strong>About:</strong> {userDescription?.about}
+          </p>
+          <p className='text-sm text-gray-500 mt-4'>
+            <strong>Work Experience:</strong> {workXP}
+          </p>
+
           {userDescription?.role && (
             <p className='text-sm text-gray-500 mt-4'>
               <strong>Role:</strong> {userDescription?.role}

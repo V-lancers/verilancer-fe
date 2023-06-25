@@ -16,9 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Layout from './Layout';
 import { useEffect } from 'react';
 import { SessionProvider } from 'next-auth/react';
-import UserOAuth from '../components/UserOAuth';
-import MetamaskButton from '../components/MetamaskButton';
-
+import contributors from 'src/queries/contributors.js';
 const chains: Chain[] = [customChains.polygonMumbai];
 
 // Wagmi client
@@ -40,7 +38,17 @@ const ethereumClient = new EthereumClient(wagmiClient, chains);
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await contributors();
+        console.log(data);
+        // Do something with the data
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
     wagmiClient.autoConnect();
+    fetchData();
   }, []);
 
   return (

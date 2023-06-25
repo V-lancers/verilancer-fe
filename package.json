@@ -37,6 +37,7 @@
     "react-router-dom": "^6.4.2",
     "react-tippy": "^1.4.0",
     "react-toastify": "^9.1.1",
+    "urql": "^4.0.4",
     "wagmi": "^0.8.5",
     "yup": "^0.32.11"
   },
