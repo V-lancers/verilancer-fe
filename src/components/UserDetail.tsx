@@ -19,12 +19,12 @@ import { useSigner } from 'wagmi';
 import { ethers } from 'ethers';
 import client from '../api/apollo';
 import { ApolloQueryResult, gql } from '@apollo/client';
-import workXP from '../assets/workXP.png';
 
 function UserDetail({ user }: { user: IUser }) {
   const { user: currentUser } = useContext(TalentLayerContext);
   const userDescription = user?.id ? useUserById(user?.id)?.description : null;
   const [graphData, setGraphData] = useState<ApolloQueryResult<any>>();
+  const [workXP, setWorkXP] = useState<string>();
 
   if (!user?.id) {
     return <Loading />;
@@ -38,6 +38,21 @@ function UserDetail({ user }: { user: IUser }) {
       const contract = new ethers.Contract(contractAddress, abi, signer);
       const tx = await contract.checkSismoGithub(sismoResponse);
       console.log('transaction', tx);
+    }
+  };
+
+  if (user && signer) {
+    console.log('user', user.address);
+  }
+
+  const getWorkExperience = async () => {
+    if (signer) {
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tx = await contract.getWorkExperience(user.address);
+      console.log('transaction:  ', tx);
+
+      return tx;
     }
   };
 
@@ -74,6 +89,20 @@ function UserDetail({ user }: { user: IUser }) {
 
     return uniqueContributors;
   }
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        console.log('getting work experience....');
+        setWorkXP(await getWorkExperience());
+
+        console.log(workXP);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const uniqueContributors = filterUniqueContributors(graphData?.data);
