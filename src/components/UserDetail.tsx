@@ -18,7 +18,34 @@ import { contractAddress, abi } from '../constants/smartcontractinfo';
 import { useSigner } from 'wagmi';
 import { ethers } from 'ethers';
 // import UserOAuth from './UserOAuth';
+import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 
+// async function attest(address: string) {
+//   const eas = new EAS(EASContractAddress);
+//   eas.connect(signer);
+  
+//   // Initialize SchemaEncoder with the schema string
+//   const schemaEncoder = new SchemaEncoder("boolean attest");
+//   const encodedData = schemaEncoder.encodeData([
+//     { name: "attest", value: true, type: "boolean" },
+//   ]);
+  
+//   const schemaUID = "0xb16fa048b0d597f5a821747eba64efa4762ee5143e9a80600d0005386edfc995";
+  
+//   const tx = await eas.attest({
+//     schema: schemaUID,
+//     data: {
+//       recipient: "0xFD50b031E778fAb33DfD2Fc3Ca66a1EeF0652165",
+//       expirationTime: 0,
+//       revocable: true,
+//       data: encodedData,
+//     },
+//   });
+  
+//   const newAttestationUID = await tx.wait();
+  
+//   console.log("New attestation UID:", newAttestationUID);
+// }
 
 function UserDetail({ user }: { user: IUser }) {
   const { user: currentUser } = useContext(TalentLayerContext);
@@ -124,6 +151,7 @@ function UserDetail({ user }: { user: IUser }) {
           <p className='text-sm text-gray-500 mt-4'>
             <strong>Work Experience:</strong> {workXP}
           </p>
+          <button /*onClick={() => attest(user.address)}*/>Attest</button>
 
           {userDescription?.role && (
             <p className='text-sm text-gray-500 mt-4'>
