@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import TalentLayerContext from '../context/talentLayer';
 import useUserById from '../hooks/useUserById';
 import PohModule from '../modules/Poh/PohModule';
@@ -18,11 +18,13 @@ import { contractAddress, abi } from '../constants/smartcontractinfo';
 import { useSigner } from 'wagmi';
 import { ethers } from 'ethers';
 import UserOAuth from './UserOAuth';
-
+import client from '../api/apollo';
+import { ApolloQueryResult, gql } from '@apollo/client';
 
 function UserDetail({ user }: { user: IUser }) {
   const { user: currentUser } = useContext(TalentLayerContext);
   const userDescription = user?.id ? useUserById(user?.id)?.description : null;
+  const [graphData, setGraphData] = useState<ApolloQueryResult<any>>();
 
   if (!user?.id) {
     return <Loading />;
@@ -33,18 +35,50 @@ function UserDetail({ user }: { user: IUser }) {
 
   const checkSismo = async (sismoResponse: string) => {
     if (signer) {
-
-      const contract = new ethers.Contract(
-        contractAddress,
-        abi,
-        signer,
-      );
-
-      const tx = await contract.checkSismoGithub(sismoResponse)
-      console.log("transaction", tx)
-
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+      const tx = await contract.checkSismoGithub(sismoResponse);
+      console.log('transaction', tx);
     }
+  };
+
+  client
+    .query({
+      query: gql(`query {
+      verifiedGithubContributors {
+        id
+        contributor
+        blockNumber
+        blockTimestamp
+      }
+    }`),
+      variables: {
+        orderBy: 'createdAtTimestamp',
+        orderDirection: 'desc',
+      },
+    })
+    .then(data => setGraphData(data))
+    .catch(err => {
+      console.log('Error fetching data: ', err);
+    });
+
+  function filterUniqueContributors(data: any[]): string[] {
+    const uniqueContributors: string[] = [];
+
+    for (let i = 0; i < data?.length; i++) {
+      const contributor = data[i]?.contributor;
+
+      if (contributor && !uniqueContributors.includes(contributor)) {
+        uniqueContributors.push(contributor);
+      }
+    }
+
+    return uniqueContributors;
   }
+
+  useEffect(() => {
+    const uniqueContributors = filterUniqueContributors(graphData?.data);
+    console.log('Unique contributors:', graphData?.data.verifiedGithubContributors);
+  }, []);
 
   return (
     <div>
